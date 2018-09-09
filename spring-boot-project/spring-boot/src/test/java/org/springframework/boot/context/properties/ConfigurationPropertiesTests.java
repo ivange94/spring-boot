@@ -37,8 +37,8 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
+import org.junit.rules.ExpectedException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.FactoryBean;
@@ -81,6 +81,7 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.fail;
@@ -109,10 +110,10 @@ public class ConfigurationPropertiesTests {
 	private AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 
 	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+	public OutputCapture output = new OutputCapture();
 
 	@Rule
-	public OutputCapture output = new OutputCapture();
+	public ExpectedException thrown = ExpectedException.none();
 
 	@After
 	public void cleanup() {
@@ -225,9 +226,10 @@ public class ConfigurationPropertiesTests {
 
 	@Test
 	public void loadWhenBindingWithoutAndAnnotationShouldFail() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("No ConfigurationProperties annotation found");
-		load(WithoutAndAnnotationConfiguration.class, "name:foo");
+		assertThatIllegalArgumentException()
+				.isThrownBy(
+						() -> load(WithoutAndAnnotationConfiguration.class, "name:foo"))
+				.withMessageContaining("No ConfigurationProperties annotation found");
 	}
 
 	@Test

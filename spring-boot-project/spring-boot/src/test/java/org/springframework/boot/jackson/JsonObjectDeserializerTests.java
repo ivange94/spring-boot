@@ -27,13 +27,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.NullNode;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.springframework.boot.jackson.NameAndAgeJsonComponent.Deserializer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -43,9 +42,6 @@ import static org.mockito.Mockito.mock;
  * @author Phillip Webb
  */
 public class JsonObjectDeserializerTests {
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private TestJsonObjectDeserializer<Object> testDeserializer = new TestJsonObjectDeserializer<>();
 
@@ -70,9 +66,9 @@ public class JsonObjectDeserializerTests {
 
 	@Test
 	public void nullSafeValueWhenClassIsNullShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("Type must not be null");
-		this.testDeserializer.testNullSafeValue(mock(JsonNode.class), null);
+		assertThatIllegalArgumentException().isThrownBy(
+				() -> this.testDeserializer.testNullSafeValue(mock(JsonNode.class), null))
+				.withMessageContaining("Type must not be null");
 	}
 
 	@Test
@@ -151,35 +147,35 @@ public class JsonObjectDeserializerTests {
 
 	@Test
 	public void nullSafeValueWhenClassIsUnknownShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("Unsupported value type java.io.InputStream");
-		this.testDeserializer.testNullSafeValue(mock(JsonNode.class), InputStream.class);
-
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> this.testDeserializer
+						.testNullSafeValue(mock(JsonNode.class), InputStream.class))
+				.withMessageContaining("Unsupported value type java.io.InputStream");
 	}
 
 	@Test
 	public void getRequiredNodeWhenTreeIsNullShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("Tree must not be null");
-		this.testDeserializer.testGetRequiredNode(null, "test");
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> this.testDeserializer.testGetRequiredNode(null, "test"))
+				.withMessageContaining("Tree must not be null");
 	}
 
 	@Test
 	public void getRequiredNodeWhenNodeIsNullShouldThrowException() {
 		JsonNode tree = mock(JsonNode.class);
 		given(tree.get("test")).willReturn(null);
-		this.thrown.expect(IllegalStateException.class);
-		this.thrown.expectMessage("Missing JSON field 'test'");
-		this.testDeserializer.testGetRequiredNode(tree, "test");
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> this.testDeserializer.testGetRequiredNode(tree, "test"))
+				.withMessageContaining("Missing JSON field 'test'");
 	}
 
 	@Test
 	public void getRequiredNodeWhenNodeIsNullNodeShouldThrowException() {
 		JsonNode tree = mock(JsonNode.class);
 		given(tree.get("test")).willReturn(NullNode.instance);
-		this.thrown.expect(IllegalStateException.class);
-		this.thrown.expectMessage("Missing JSON field 'test'");
-		this.testDeserializer.testGetRequiredNode(tree, "test");
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> this.testDeserializer.testGetRequiredNode(tree, "test"))
+				.withMessageContaining("Missing JSON field 'test'");
 	}
 
 	@Test

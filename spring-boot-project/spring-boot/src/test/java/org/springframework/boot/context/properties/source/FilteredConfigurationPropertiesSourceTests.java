@@ -18,12 +18,11 @@ package org.springframework.boot.context.properties.source;
 
 import java.util.Objects;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Answers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
@@ -36,22 +35,19 @@ import static org.mockito.Mockito.withSettings;
  */
 public class FilteredConfigurationPropertiesSourceTests {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
 	public void createWhenSourceIsNullShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("Source must not be null");
-		new FilteredConfigurationPropertiesSource(null, Objects::nonNull);
+		assertThatIllegalArgumentException().isThrownBy(
+				() -> new FilteredConfigurationPropertiesSource(null, Objects::nonNull))
+				.withMessageContaining("Source must not be null");
 	}
 
 	@Test
 	public void createWhenFilterIsNullShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("Filter must not be null");
-		new FilteredConfigurationPropertiesSource(new MockConfigurationPropertySource(),
-				null);
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> new FilteredConfigurationPropertiesSource(
+						new MockConfigurationPropertySource(), null))
+				.withMessageContaining("Filter must not be null");
 	}
 
 	@Test

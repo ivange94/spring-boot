@@ -30,9 +30,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.annotation.WebInitParam;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -41,6 +39,8 @@ import org.springframework.context.annotation.ScannedGenericBeanDefinition;
 import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
  * Tests for {@link WebFilterHandler}
@@ -52,9 +52,6 @@ public class WebFilterHandlerTests {
 	private final WebFilterHandler handler = new WebFilterHandler();
 
 	private final SimpleBeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -147,10 +144,10 @@ public class WebFilterHandlerTests {
 
 	@Test
 	public void urlPatternsDeclaredTwice() throws IOException {
-		this.thrown.expect(IllegalStateException.class);
-		this.thrown.expectMessage(
-				"The urlPatterns and value attributes are mutually exclusive.");
-		getBeanDefinition(UrlPatternsDeclaredTwiceFilter.class);
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> getBeanDefinition(UrlPatternsDeclaredTwiceFilter.class))
+				.withMessageContaining(
+						"The urlPatterns and value attributes are mutually exclusive.");
 	}
 
 	BeanDefinition getBeanDefinition(Class<?> filterClass) throws IOException {

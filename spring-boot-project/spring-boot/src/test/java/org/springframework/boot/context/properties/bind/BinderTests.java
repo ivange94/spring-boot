@@ -52,6 +52,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -68,12 +69,12 @@ import static org.mockito.Mockito.withSettings;
  */
 public class BinderTests {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	private List<ConfigurationPropertySource> sources = new ArrayList<>();
 
 	private Binder binder;
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	@Before
 	public void setup() {
@@ -82,24 +83,26 @@ public class BinderTests {
 
 	@Test
 	public void createWhenSourcesIsNullShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("Sources must not be null");
-		new Binder((Iterable<ConfigurationPropertySource>) null);
+		assertThatIllegalArgumentException()
+				.isThrownBy(
+						() -> new Binder((Iterable<ConfigurationPropertySource>) null))
+				.withMessageContaining("Sources must not be null");
 	}
 
 	@Test
 	public void bindWhenNameIsNullShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("Name must not be null");
-		this.binder.bind((ConfigurationPropertyName) null, Bindable.of(String.class),
-				BindHandler.DEFAULT);
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> this.binder.bind((ConfigurationPropertyName) null,
+						Bindable.of(String.class), BindHandler.DEFAULT))
+				.withMessageContaining("Name must not be null");
 	}
 
 	@Test
 	public void bindWhenTargetIsNullShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("Target must not be null");
-		this.binder.bind(ConfigurationPropertyName.of("foo"), null, BindHandler.DEFAULT);
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> this.binder.bind(ConfigurationPropertyName.of("foo"),
+						null, BindHandler.DEFAULT))
+				.withMessageContaining("Target must not be null");
 	}
 
 	@Test

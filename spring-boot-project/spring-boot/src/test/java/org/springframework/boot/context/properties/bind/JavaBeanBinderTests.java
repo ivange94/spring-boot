@@ -39,6 +39,7 @@ import org.springframework.boot.convert.Delimiter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.entry;
 
 /**
@@ -49,12 +50,12 @@ import static org.assertj.core.api.Assertions.entry;
  */
 public class JavaBeanBinderTests {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	private List<ConfigurationPropertySource> sources = new ArrayList<>();
 
 	private Binder binder;
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	@Before
 	public void setup() {
@@ -326,9 +327,8 @@ public class JavaBeanBinderTests {
 		MockConfigurationPropertySource source = new MockConfigurationPropertySource();
 		source.put("foo.nested.foo", "bar");
 		this.sources.add(source);
-		this.thrown.expect(BindException.class);
-		this.binder.bind("foo",
-				Bindable.of(ExampleImmutableNestedBeanWithoutSetter.class));
+		assertThatExceptionOfType(BindException.class).isThrownBy(() -> this.binder
+				.bind("foo", Bindable.of(ExampleImmutableNestedBeanWithoutSetter.class)));
 	}
 
 	@Test
@@ -392,8 +392,8 @@ public class JavaBeanBinderTests {
 	@Test
 	public void bindToClassWhenPropertyCannotBeConvertedShouldThrowException() {
 		this.sources.add(new MockConfigurationPropertySource("foo.int-value", "foo"));
-		this.thrown.expect(BindException.class);
-		this.binder.bind("foo", Bindable.of(ExampleValueBean.class));
+		assertThatExceptionOfType(BindException.class).isThrownBy(
+				() -> this.binder.bind("foo", Bindable.of(ExampleValueBean.class)));
 	}
 
 	@Test

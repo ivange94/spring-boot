@@ -16,11 +16,10 @@
 
 package org.springframework.boot.context.properties.bind.validation;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -31,14 +30,11 @@ import static org.mockito.Mockito.mock;
  */
 public class BindValidationExceptionTests {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
 	public void createWhenValidationErrorsIsNullShouldThrowException() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("ValidationErrors must not be null");
-		new BindValidationException(null);
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> new BindValidationException(null))
+				.withMessageContaining("ValidationErrors must not be null");
 	}
 
 	@Test
